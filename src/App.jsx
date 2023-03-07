@@ -16,13 +16,16 @@ import Popular from "./components/People/Popular";
 import Persondetail from "./components/persondetail/Persondetail";
 
 export default function App() {
+  
   const [user, setUser] = useState(null);
   const nav = useNavigate();
+
   function userDataTokenDecode() {
     const token = localStorage.getItem("userToken");
     const decode = jwtDecode(token);
     setUser(decode);
   }
+  
   useEffect(() => {
     if (localStorage.getItem("userToken")) {
       userDataTokenDecode();
