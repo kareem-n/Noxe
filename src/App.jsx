@@ -21,13 +21,15 @@ export default function App() {
   const nav = useNavigate();
 
   function userDataTokenDecode() {
-    const token = localStorage.getItem("userToken");
-    const decode = jwtDecode(token);
+    const decode = localStorage.getItem("userToken");
+    // const decode = jwtDecode(token);
     setUser(decode);
   }
   
   useEffect(() => {
+    
     if (localStorage.getItem("userToken")) {
+      console.log(0);
       userDataTokenDecode();
     }
   }, []);

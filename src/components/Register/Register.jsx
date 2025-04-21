@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Joi from "joi";
+import { auth } from "../../config";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function Register() {
   const nav = useNavigate();
@@ -57,17 +59,27 @@ export default function Register() {
       setErrors(validationFunction.error.details);
       setLoading(false);
     } else {
-      let { data } = await axios.post(
-        "https://route-movies-api.vercel.app/signup",
-        user
-      );
-      if (data.message === "success") {
-        nav("/login");
-        setLoading(false);
-      } else {
-        setError(data.message);
-        setLoading(false);
-      }
+      createUserWithEmailAndPassword(auth, user.email, user.password)
+        .then((response) => {
+          nav("/login");
+          setLoading(false);
+        })
+        .catch((error) => {
+          setError(error);
+          setLoading(false);
+        });
+
+      // let { data } = await axios.post(
+      //   "https://route-movies-api.vercel.app/signup",
+      //   user
+      // );
+
+      // if (data.message === "success") {
+      //
+      // } else {
+      //   setError(data.message);
+      //   setLoading(false);
+      // }
     }
   }
   return (

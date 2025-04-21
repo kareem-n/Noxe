@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Joi from "joi";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../config";
 
 export default function Login(props) {
   const nav = useNavigate();
@@ -34,7 +36,7 @@ export default function Login(props) {
   function validation() {
     const schema = Joi.object({
       email: Joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ["com", "net","org"] } })
+        .email({ minDomainSegments: 2, tlds: { allow: ["com", "net", "org"] } })
         .required(),
       password: Joi.string()
         .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
@@ -51,20 +53,21 @@ export default function Login(props) {
       setErrors(validationFunction.error.details);
       setLoading(false);
     } else {
-      let { data } = await axios.post(
-        "https://route-movies-api.vercel.app/signin",
-        user
-      );
-      if (data.message === "success") {
-        nav("/home");
-        localStorage.setItem('userToken' , data.token) ;
-         props.token() ;
+      signInWithEmailAndPassword(auth, user.email, user.password).then(
+        (data) => {
+          nav("/home");
+          localStorage.setItem("userToken", data.user.accessToken);
+          props.token();
+          setLoading(false);
+        }
+      ).catch( error => {
+        setError("Invalid Login Attempt");
+        console.log(error);
+        
         setLoading(false);
+      } );
 
-      } else {
-        setError(data.message);
-        setLoading(false);
-      }
+      
     }
   }
   return (
@@ -91,10 +94,6 @@ export default function Login(props) {
           ) : (
             ""
           )}
-
-          
-
-          
 
           <label htmlFor="email" className="form-label">
             Email
